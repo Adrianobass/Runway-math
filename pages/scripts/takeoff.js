@@ -1,5 +1,5 @@
 async function loadAircraftData(aircraft) {
-  const response = await fetch(`./data/${aircraft}_specifications.json`);
+  const response = await fetch(`./data/${aircraft}.json`);
   if (!response.ok) {
     throw new Error("Failed to load aircraft data");
     alert("Aircraft data could not be loaded.");
@@ -24,7 +24,7 @@ async function aproximate_flaps_setting(flapsSetting) {
     if(flapsSetting === '') {
         return flapsValue;
     }
-    if(flapsettings<0) {
+    if(flapsSetting<0) {
         return flapsSetting*-1;
     }
     if(isNaN(flapsSetting)) {
@@ -78,7 +78,7 @@ document.getElementById('takeoff-form').addEventListener('submit', async (event)
 
         const aircraft_empty_weight = data.emptyWeight;
         const aircraft_weight = aircraft_empty_weight + fuelLoad + payload;
-        console.log(`Aircraft Weight: ${aircraft_full_weight} lbs`);
+        console.log(`Aircraft Weight: ${aircraft_weight} lbs`);
 
         //check if aiircraft weight is over max takeoff weight
         if(aircraft_weight > data.maxTakeoffWeight) {
@@ -99,7 +99,7 @@ document.getElementById('takeoff-form').addEventListener('submit', async (event)
         const flapsValue = await aproximate_flaps_setting(flapsSetting);
         console.log(`Flaps Setting: ${flapsValue} degrees`);
 
-        
+
 
 
 
