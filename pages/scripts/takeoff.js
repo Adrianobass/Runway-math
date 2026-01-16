@@ -1,11 +1,11 @@
 async function loadAircraftData(aircraft) {
-  const response = await fetch(`./data/${aircraft}.json`);
+  const response = await fetch(`../data/${aircraft}.json`);
   if (!response.ok) {
     throw new Error("Failed to load aircraft data");
     alert("Aircraft data could not be loaded.");
   }
   return await response.json();
-}
+}   
 
 async function calculatePressureAltitude(pressure, temperature, altitude) {
     const standardPressure = 1013.25;  // Standard atmospheric pressure in hPa
@@ -57,16 +57,16 @@ async function weightCorrection(weightLb, REF) {
 }
 
 
-async function airDensity(pressureAltFt) {
+async function airDensity(pressureAltFt, REF) {
   return REF.seaLevelDensity *
     Math.pow(1 - 6.875e-6 * pressureAltFt, 4.256);
 }
 
-async function densityCorrection(pressureAltFt) {
+async function densityCorrection(pressureAltFt, REF) {
   return REF.seaLevelDensity / airDensity(pressureAltFt);
 }
 
-async function windCorrection(windKt) {
+async function windCorrection(windKt, REF) {
   const ratio = windKt / REF.liftoffSpeedKt;
   return Math.max(0.7, 1 / (1 - ratio));
 }
@@ -116,10 +116,6 @@ async function calculateTakeoffGroundRoll({
 }
 
 
-
-
-
-
 document.getElementById('takeoff-form').addEventListener('submit', async (event) => {
         event.preventDefault();
 
@@ -138,11 +134,11 @@ document.getElementById('takeoff-form').addEventListener('submit', async (event)
         const data = await loadAircraftData(aircraft);
         console.log(data.takeoffPerformance);
 
-        if(emptyWeight> data.maximumUsefulLoadLb) {
+        if(payload > data.weights.maximumUsefulLoadLb.cessna152) {
             alert("Payload exceeds maximum useful load!");
             return;
-            console.log("Payload exceeds maximum useful load! by " + (emptyWeight - data.maximumUsefulLoadLb) + " lbs");
-            console.log(`Maximum Useful Load: ${data.maximumUsefulLoadLb} lbs`);
+            console.log("Payload exceeds maximum useful load! by " + (payload - data.weights.maximumUsefulLoadLb.cessna152) + " lbs");
+            console.log(`Maximum Useful Load: ${data.weights.maximumUsefulLoadLb.cessna152} lbs`);
         }
 
         if(fuelLoad > data.fuelAndOil.fuelCapacityGal) {
@@ -153,49 +149,43 @@ document.getElementById('takeoff-form').addEventListener('submit', async (event)
         }
 
         const REF = {
-            weightLb: data.takeoffPerformance.reference.weightLb,
-            groundrollFt: data.takeoffPerformance.reference.groundrollFt,
-            liftoffspeedKt: data.takeoffPerformance.reference.liftoffspeedKt,
-            seaLeveldensity: 1.225
+            weightLb: data.weights.maximum.takeoffLandingLb,
+            groundRollFt: data.takeoffPerformance.groundRollFt,
+            liftoffSpeedKt: data.stallSpeedsCAS.flapsDownPowerOff,
+            seaLevelDensity: 1.225
+
         }
 
 
-        const weightCorrectionValue = await weightCorrection(aircraft_weight, REF);
-        const airdensityValue = await airDensity(pressureAltitude);
-        const densityCorrectionValue = await densityCorrection(pressureAltitude);
-        const windCorrectionValue = await windCorrection(wind);
-        const flapCorrectionValue = await flapCorrection(flapsValue);
+
+        const windCorrectionValue = await windCorrection(wind, REF);
         const surfaceCorrectionValue = await surfaceCorrection(runwaySurface);
 
         const pressureAltitude = await calculatePressureAltitude(pressure, temperature, altitude);
         console.log(`Pressure Altitude: ${pressureAltitude} ft`);
+        const airdensityValue = await airDensity(pressureAltitude, REF);
+        const densityCorrectionValue = await densityCorrection(pressureAltitude, REF);
 
-        const aircraft_empty_weight = data.emptyWeight;
+        const aircraft_empty_weight = data.weights.standardEmptyWeightLb.cessna152;
         const aircraft_weight = aircraft_empty_weight + fuelLoad + payload;
         console.log(`Aircraft Weight: ${aircraft_weight} lbs`);
+        const weightCorrectionValue = await weightCorrection(aircraft_weight, REF);
 
-
-        if(aircraft_weight > data.maxTakeoffWeight) {
+        if(aircraft_weight > data.weights.maximum.takeoffLandingLb) {
             alert("Aircraft weight exceeds maximum takeoff weight!");
             return;
-            console.log("Aircraft weight exceeds maximum takeoff weight! by " + (aircraft_weight - data.maxTakeoffWeight) + " lbs");
-            console.log(`Max Takeoff Weight: ${data.maxTakeoffWeight} lbs`);
-        }
-
-        if(aircraft_weight < data.minTakeoffWeight) {
-            alert("Aircraft weight is below minimum takeoff weight!");
-            return;
-            console.log("Aircraft weight is below minimum takeoff weight! by " + (data.minTakeoffWeight - aircraft_weight) + " lbs");
-            console.log(`Min Takeoff Weight: ${data.minTakeoffWeight} lbs`);
+            console.log("Aircraft weight exceeds maximum takeoff weight! by " + (aircraft_weight - data.weights.maximum.takeoffLandingLb) + " lbs");
+            console.log(`Max Takeoff Weight: ${data.weights.maximum.takeoffLandingLb} lbs`);
         }
 
 
 
         const flapsValue = await aproximate_flaps_setting(flapsSetting);
         console.log(`Flaps Setting: ${flapsValue} degrees`);
+        const flapCorrectionValue = await flapCorrection(flapsValue);
 
 
-        const aircraft_max_takeoff_weight = data.maxTakeoffWeight;
+        const aircraft_max_takeoff_weight = data.weights.maximum.takeoffLandingLb;
         const aircraft_takeoff_performance = data.takeoffPerformance;
 
         const takeoffGroundRoll = await calculateTakeoffGroundRoll({
@@ -206,7 +196,8 @@ document.getElementById('takeoff-form').addEventListener('submit', async (event)
             runwaySurface: runwaySurface
         });
 
-        const obstacleClearence = takeoffGroundRoll * data.poh.takeoffPerformance.obstacleClearanceFactorRatio;
+        const obstacleClearanceRatio = data.takeoffPerformance.distanceOver50FtObstacleFt / data.takeoffPerformance.groundRollFt;
+        const obstacleClearence = takeoffGroundRoll * obstacleClearanceRatio;
         console.log(`Takeoff Ground Roll: ${takeoffGroundRoll.toFixed(2)} ft`);
 
         
