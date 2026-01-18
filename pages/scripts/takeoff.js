@@ -6,12 +6,39 @@ async function loadAircraftData(aircraft) {
   }
   return await response.json();
 }   
-
+/*
 async function calculatePressureAltitude(pressure, temperature, altitude) {
     const standardPressure = 1013.25;  // Standard atmospheric pressure in hPa
     const pressureAltitude = altitude + (standardPressure - pressure) * 30; // in feet
     return pressureAltitude;
 }
+    */
+  
+function calculatePressureAltitude(pressureHpa, fieldElevationFt) {
+  const standardPressure = 1013.25; // hPa
+  return fieldElevationFt + (standardPressure - pressureHpa) * 27;
+}
+
+function calculateVSpeeds({
+  weightLb,
+  densityAltFt,
+  REF
+}) {
+  const weightRatio = weightLb / REF.weightLb;
+  const densityFactor = Math.sqrt(densityCorrection(densityAltFt, REF));
+
+  const vr = REF.vrKt * Math.sqrt(weightRatio) * densityFactor;
+  const v1 = vr; 
+  const v2 = vr * 1.2;
+
+  return {
+    V1: v1,
+    VR: vr,
+    V2: v2
+  };
+}
+
+
 
 async function aproximate_flaps_setting(flapsSetting) {
     let flapsValue = 0;
@@ -52,24 +79,76 @@ async function aproximate_flaps_setting(flapsSetting) {
     return flapsValue;
 }
 
-async function weightCorrection(weightLb, REF) {
-  return Math.pow(weightLb / REF.weightLb, 2);
+function densityCorrection(densityAltFt, REF) {
+  const rho = airDensity(densityAltFt, REF);
+  const ratio = REF.seaLevelDensity / rho;
+  return Math.pow(ratio, 0.9); 
 }
 
 
-async function airDensity(pressureAltFt, REF) {
+function calculateDensityAltitude(pressureAltFt, temperatureC) {
+  const ISA_TEMP_SEA_LEVEL = 15; // °C
+  const tempAtAlt = ISA_TEMP_SEA_LEVEL - (pressureAltFt / 1000) * 2;
+  const isaDeviation = temperatureC - tempAtAlt;
+  return pressureAltFt + (120 * isaDeviation);
+}
+
+
+function airDensity(densityAltFt, REF) {
   return REF.seaLevelDensity *
-    Math.pow(1 - 6.875e-6 * pressureAltFt, 4.256);
+    Math.pow(1 - 6.875e-6 * densityAltFt, 4.256);
 }
 
-async function densityCorrection(pressureAltFt, REF) {
-  return REF.seaLevelDensity / await airDensity(pressureAltFt, REF);
+
+function densityCorrection(densityAltFt, REF) {
+  const rho = airDensity(densityAltFt, REF);
+  const ratio = REF.seaLevelDensity / rho;
+  return Math.pow(ratio, 0.9); 
 }
 
-async function windCorrection(windKt, REF) {
-  const ratio = windKt / REF.liftoffSpeedKt;
-  return Math.max(0.7, 1 / (1 - ratio));
+
+function windCorrection(windKt, REF) {
+  const headwind = windKt; 
+  const v = REF.liftoffSpeedKt;
+
+  const effectiveSpeed = Math.max(v - headwind, v * 0.6);
+  return Math.pow(v / effectiveSpeed, 2);
 }
+
+function calculateObstacleDistance({
+  groundRollFt,
+  weightLb,
+  densityAltFt,
+  REF
+}) {
+  const climbPenalty =
+    weightLb / REF.weightLb *
+    densityCorrection(densityAltFt, REF);
+
+  const climbSegmentFt = REF.climbTo50FtBase * climbPenalty;
+  return groundRollFt + climbSegmentFt;
+}
+
+function calculateVSpeeds({
+  weightLb,
+  densityAltFt,
+  REF
+}) {
+  const weightRatio = weightLb / REF.weightLb;
+  const densityFactor = Math.sqrt(densityCorrection(densityAltFt, REF));
+
+  const vr = REF.vrKt * Math.sqrt(weightRatio) * densityFactor;
+  const v1 = vr; 
+  const v2 = vr * 1.2;
+
+  return {
+    V1: v1,
+    VR: vr,
+    V2: v2
+  };
+}
+
+
 
 async function flapCorrection(flapsDeg) {
   if (flapsDeg <= 0) return 1.0;
@@ -100,21 +179,22 @@ async function surfaceCorrection(surface) {
   }
 }
 
-async function calculateTakeoffGroundRoll({
+function calculateTakeoffGroundRoll({
   weightLb,
-  pressureAltFt,
+  densityAltFt,
   windKt,
   flapsDeg,
   runwaySurface,
   REF
 }) {
   return REF.groundRollFt
-    * await weightCorrection(weightLb, REF)
-    * await densityCorrection(pressureAltFt, REF)
-    * await windCorrection(windKt, REF)
-    * await flapCorrection(flapsDeg)
-    * await surfaceCorrection(runwaySurface);
+    * weightCorrection(weightLb, REF)
+    * densityCorrection(densityAltFt, REF)
+    * windCorrection(windKt, REF)
+    * flapCorrection(flapsDeg)
+    * surfaceCorrection(runwaySurface);
 }
+
 
 
 document.getElementById('takeoff-form').addEventListener('submit', async (event) => {
@@ -153,7 +233,9 @@ document.getElementById('takeoff-form').addEventListener('submit', async (event)
             weightLb: data.weights.maximum.takeoffLandingLb,
             groundRollFt: data.takeoffPerformance.groundRollFt,
             liftoffSpeedKt: data.stallSpeedsCAS.flapsDownPowerOff,
-            seaLevelDensity: 1.225
+            seaLevelDensity: 1.225,
+            climbTo50FtBase: data.takeoffPerformance.distanceOver50FtObstacleFt
+
 
         }
 
@@ -207,7 +289,7 @@ document.getElementById('takeoff-form').addEventListener('submit', async (event)
             <p><strong>Takeoff Ground Roll:</strong> ${takeoffGroundRoll.toFixed(2)} ft</p>
             <p><strong>Distance to Clear 50 ft Obstacle:</strong> ${obstacleClearence.toFixed(2)} ft</p>
         `;
-        
+
 
 
 

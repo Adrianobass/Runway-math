@@ -1,6 +1,7 @@
 # Phase 0
 - calculate other takeoff speeds such as v1
 - for takeoff page add a runway lenght input and obstacle distance to calculate if runway is long enough
+- Set up workflow with Actions to automatically deploy somewhere, probably RPI
 - Calculate fuel consumption for TAXI and takeoff
 - calculate landing performance
 - Calculate climb performance
