@@ -38,6 +38,10 @@ function calculateVSpeeds({
   };
 }
 
+async function weightCorrection(weightLb, REF) {
+  return Math.pow(weightLb / REF.weightLb, 2);
+}
+
 
 
 async function aproximate_flaps_setting(flapsSetting) {
