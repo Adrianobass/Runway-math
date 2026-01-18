@@ -63,7 +63,7 @@ async function airDensity(pressureAltFt, REF) {
 }
 
 async function densityCorrection(pressureAltFt, REF) {
-  return REF.seaLevelDensity / airDensity(pressureAltFt);
+  return REF.seaLevelDensity / await airDensity(pressureAltFt, REF);
 }
 
 async function windCorrection(windKt, REF) {
@@ -105,14 +105,15 @@ async function calculateTakeoffGroundRoll({
   pressureAltFt,
   windKt,
   flapsDeg,
-  runwaySurface
+  runwaySurface,
+  REF
 }) {
   return REF.groundRollFt
-    * weightCorrection(weightLb)
-    * densityCorrection(pressureAltFt)
-    * windCorrection(windKt)
-    * flapCorrection(flapsDeg)
-    * surfaceCorrection(runwaySurface);
+    * await weightCorrection(weightLb, REF)
+    * await densityCorrection(pressureAltFt, REF)
+    * await windCorrection(windKt, REF)
+    * await flapCorrection(flapsDeg)
+    * await surfaceCorrection(runwaySurface);
 }
 
 
@@ -194,12 +195,18 @@ document.getElementById('takeoff-form').addEventListener('submit', async (event)
             windKt: wind,
             flapsDeg: flapsValue,
             runwaySurface: runwaySurface
+          , REF: REF
         });
 
         const obstacleClearanceRatio = data.takeoffPerformance.distanceOver50FtObstacleFt / data.takeoffPerformance.groundRollFt;
         const obstacleClearence = takeoffGroundRoll * obstacleClearanceRatio;
         console.log(`Takeoff Ground Roll: ${takeoffGroundRoll.toFixed(2)} ft`);
 
+        document.getElementById('result').innerHTML = `
+            <h2>Takeoff Performance Results</h2>
+            <p><strong>Takeoff Ground Roll:</strong> ${takeoffGroundRoll.toFixed(2)} ft</p>
+            <p><strong>Distance to Clear 50 ft Obstacle:</strong> ${obstacleClearence.toFixed(2)} ft</p>
+        `;
         
 
 
